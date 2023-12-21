@@ -1,4 +1,5 @@
 # UI Library
+from langchain.schema import AIMessage, HumanMessage
 import streamlit as st
 
 # URL Image Extractions
@@ -124,7 +125,7 @@ def main():
         if "history" not in st.session_state:
             st.snow()
             memory = ConversationBufferMemory(memory_key='history', return_messages=True)
-            model_name = "gpt-4"
+            model_name = "gpt-4-32k-0613"
             llm = ChatOpenAI(model_name=model_name, openai_api_key=OPENAI_API_KEY, max_tokens=1000)
             conversation_chain = ConversationChain(
                 llm=llm,
@@ -147,6 +148,12 @@ def main():
                         text += page.extract_text()
                 elif ".docx" in file.name:
                     text += docx2txt.process(file)
+                #st.session_state.conversation({'input': text})
+                
+            st.session_state.history.chat_memory.messages.append(HumanMessage(content=text, additional_kwargs={}))
+            st.session_state.history.chat_memory.messages.append(AIMessage(content='', additional_kwargs={}))
+            
+                        
 
         st.text_input(":orange[**How can I help you?**]", placeholder="Enter your question here", key='widget', on_change=submit)  
 
@@ -154,24 +161,26 @@ def main():
         
         
         if user_question!="":
-            if text!="":
-                user_question+=text
-        
             st.balloons()
-            # [Rest of the code...]
-
+            # if text!="":
+            #     user_question+=text
+        
+            
+            
             with st.spinner(text="**Operation in progress ⏳**"):
                 with get_openai_callback() as cost:
                     response = st.session_state.conversation({'input': user_question})
                 st.session_state.openai_cost.append(cost.total_cost)
-
-            for index, message in enumerate(response['history']):
-                if index%2==0:
-                    st.write("<h6 style='color:#d95a00;'>"+message.content+"</h6>", unsafe_allow_html = True)
-                    st.write("**Cost of Operation: :green[$"+str('%.6f'%(st.session_state.openai_cost[int(index/2)]))+"]**")
-                else: 
-                    st.write("<h6>"+message.content+"</h6>", unsafe_allow_html = True)
+            output = response['history'][-1].content
             
+            st.write("<h6>Question: "+response['history'][-2].content+"</h6>", unsafe_allow_html = True)
+            
+            st.write("**Response: :orange["+output+"]**") 
+            st.write("**Cost of Operation: :green[$"+str('%.6f'%(st.session_state.openai_cost[-1]))+"]**")
+            
+            user_question=""
+            
+        print(st.session_state.history.chat_memory.messages)    
 
 
 if __name__ == '__main__':
