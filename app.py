@@ -17,6 +17,7 @@ import os
 from dotenv import load_dotenv
 
 # Open AI And Facebook's Similarity Search Libraries
+import tiktoken
 from langchain.chat_models import ChatOpenAI
 from langchain.vectorstores import FAISS
 from langchain.callbacks import get_openai_callback
@@ -93,6 +94,21 @@ def submit():
     st.session_state.my_text = st.session_state.widget
     st.session_state.widget = ""
 
+@st.cache(show_spinner=False)
+def parse_file(file_list):
+    text=""
+    if file_list: 
+        for file in file_list:
+            text += file.name
+            if ".pdf" in file.name:
+                pdf_reader = PdfReader(file)
+                for page in pdf_reader.pages:
+                    text += page.extract_text()
+            elif ".docx" in file.name:
+                text += docx2txt.process(file)
+        st.session_state.history.chat_memory.messages.append(HumanMessage(content=text, additional_kwargs={}))
+        st.session_state.history.chat_memory.messages.append(AIMessage(content='', additional_kwargs={}))
+
 def main():
     # URL Title and Logo
     urllib.request.urlretrieve('https://ontariotechu.ca/favicon.ico', "img.png")
@@ -125,8 +141,8 @@ def main():
         if "history" not in st.session_state:
             st.snow()
             memory = ConversationBufferMemory(memory_key='history', return_messages=True)
-            model_name = "gpt-4-32k-0613"
-            llm = ChatOpenAI(model_name=model_name, openai_api_key=OPENAI_API_KEY, max_tokens=1000)
+            model_name = "gpt-3.5-turbo-16k-0613"
+            llm = ChatOpenAI(model_name=model_name, openai_api_key=OPENAI_API_KEY)
             conversation_chain = ConversationChain(
                 llm=llm,
                 memory=memory
@@ -138,49 +154,40 @@ def main():
         
         file_list = st.file_uploader(":orange[**Please upload your PDF or DOCX files here:**]", type=["pdf","docx"], accept_multiple_files=True) 
         # Extract the text from each PDF
-        text=""
-        if file_list: 
-            for file in file_list:
-                text += file.name
-                if ".pdf" in file.name:
-                    pdf_reader = PdfReader(file)
-                    for page in pdf_reader.pages:
-                        text += page.extract_text()
-                elif ".docx" in file.name:
-                    text += docx2txt.process(file)
-                #st.session_state.conversation({'input': text})
+        parse_file(file_list)
+            
+        if file_list is not None:                  
+
+            st.text_input(":orange[**How can I help you?**]", placeholder="Enter your question here", key='widget', on_change=submit)  
+
+            user_question = st.session_state.get('my_text', '')
+            
+            
+            if user_question!="":
+                st.balloons()
+                # if text!="":
+                #     user_question+=text
+            
                 
-            st.session_state.history.chat_memory.messages.append(HumanMessage(content=text, additional_kwargs={}))
-            st.session_state.history.chat_memory.messages.append(AIMessage(content='', additional_kwargs={}))
+                
+                with st.spinner(text="**Operation in progress ⏳**"):
+                    with get_openai_callback() as cost:
+                        response = st.session_state.conversation({'input': user_question})
+                    st.session_state.openai_cost.append(cost.total_cost)
+                output = response['history'][-1].content
+                
+                st.write("<h6>Question: "+response['history'][-2].content+"</h6>", unsafe_allow_html = True)
+                
+                st.write("**Response: "+":orange["+output+"]**") 
+                st.write("**Cost of Operation: :green[$"+str('%.6f'%(0.0001*(len(output)/3)/1000))+"]**")
+                
+                #Not working for gpt-3.5-turbo-1106 and gpt-4-1106-preview
+                #st.write("**Cost of Operation: :green[$"+str('%.6f'%(st.session_state.openai_cost[-1]))+"]**")
+                
+                user_question=""
             
-                        
-
-        st.text_input(":orange[**How can I help you?**]", placeholder="Enter your question here", key='widget', on_change=submit)  
-
-        user_question = st.session_state.get('my_text', '')
-        
-        
-        if user_question!="":
-            st.balloons()
-            # if text!="":
-            #     user_question+=text
-        
-            
-            
-            with st.spinner(text="**Operation in progress ⏳**"):
-                with get_openai_callback() as cost:
-                    response = st.session_state.conversation({'input': user_question})
-                st.session_state.openai_cost.append(cost.total_cost)
-            output = response['history'][-1].content
-            
-            st.write("<h6>Question: "+response['history'][-2].content+"</h6>", unsafe_allow_html = True)
-            
-            st.write("**Response: :orange["+output+"]**") 
-            st.write("**Cost of Operation: :green[$"+str('%.6f'%(st.session_state.openai_cost[-1]))+"]**")
-            
-            user_question=""
-            
-        print(st.session_state.history.chat_memory.messages)    
+            #debugging    
+            #print(st.session_state.history.chat_memory.messages)    
 
 
 if __name__ == '__main__':
