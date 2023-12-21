@@ -25,20 +25,8 @@ from langchain.chains.question_answering import load_qa_chain
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationChain
 
-# Adding Background Image and Removing Watermark
-def html_configurations():
-    st.markdown(
-          f"""
-          <style>
-          .stApp {{
-              background-image: url("https://images.unsplash.com/photo-1518655048521-f130df041f66?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2670&q=80");
-              background-attachment: fixed;
-              background-size: cover;
-          }}
-         </style>
-         """,
-         unsafe_allow_html=True
-      )
+# Removing Watermark
+def footer():
     hide_streamlit_style = """
             <style>
             footer {visibility: hidden;}
@@ -57,53 +45,133 @@ def sidebar_img():
         }
     </style>
     """, unsafe_allow_html=True)
-    
-def main(): 
+
+def container():
+    st.markdown("""
+    <style>
+        [data-testid=stAppViewContainer] {
+            background-color: #e5e7e9;
+            background-image: url("https://images.unsplash.com/photo-1559239115-ce3eb7cb87ea?q=80&w=3788&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+            background-position: right -200px top 40px;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+        }
+    </style>            
+    """, unsafe_allow_html=True)
+
+
+# <style>
+#     #MainMenu, header, footer {visibility: hidden;}
+
+#     /* This code gets the first element on the sidebar,
+#     and overrides its default styling */
+#     section[data-testid="stHeader"] div:first-child {
+#         top: 0;
+#         height: 100vh;
+#     }
+# </style>
+
+def header():
+    st.markdown("""
+    <style>
+        [data-testid=stHeader] {
+            background-color: #e5e7e9;
+        }
+    </style>            
+    """, unsafe_allow_html=True)
+
+def remove_alert():
+    st.markdown("""
+    <style>
+        .stAlert {display:none;}
+    </style>
+    """, unsafe_allow_html=True)
+
+def submit():
+    st.session_state.my_text = st.session_state.widget
+    st.session_state.widget = ""
+
+def main():
     # URL Title and Logo
     urllib.request.urlretrieve('https://ontariotechu.ca/favicon.ico', "img.png")
     img = Image.open("img.png")
-    st.set_page_config(page_title="LLM Model", page_icon=img)
-    # Adding Background Image and Removing Watermark
-    html_configurations()     
+    st.set_page_config(page_title="LLM Model", page_icon=img, layout="centered")
+    
+    # Adding CSS
+    container()
+    header()
+    footer()     
     sidebar_img()
+    
     # Title
-    st.markdown("<h2>\n👨🏽‍💻 Testing Engineering Model 👩🏽‍💻</h2>", unsafe_allow_html = True)
+    st.markdown("<h2>&emsp;&nbsp;&emsp;👨🏽‍💻 Testing Engineering Model 👩🏽‍💻</h2>", unsafe_allow_html = True)
     st.sidebar.markdown("## API Configuration 🔧")
     
-    OPENAI_API_KEY = st.sidebar.text_input(":orange[**Add your OpenAI API key and press Enter**]", type="password")
+    OPENAI_API_KEY = st.sidebar.text_input(":orange[**Add your OpenAI key and Press Enter**]", type="password")
 
+    st.warning('Please Enter your Open AI Key to start', icon="⚠️")
+    
     if OPENAI_API_KEY:
-    # Initializing variables in the first instance to save in memory and prevent reset
-      if "history" not in st.session_state:
-          st.balloons()
-          memory = ConversationBufferMemory(memory_key='history', return_messages=True)
-          model_name = "gpt-3.5-turbo"
-          llm = ChatOpenAI(model_name=model_name, openai_api_key=OPENAI_API_KEY)
-          conversation_chain = ConversationChain(
-              llm=llm,
-              memory=memory
-          )
-          st.session_state.conversation = conversation_chain
-          st.session_state.history = memory
-          st.session_state.openai_cost = [] 
+        st.toast('Thanks', icon='🥳')
+        remove_alert()
+        
+        if st.sidebar.button("Clear Chat History"):
+            if "history" in st.session_state:
+                st.session_state.clear()
+        
+        # Initializing variables in the first instance to save in memory and prevent reset
+        if "history" not in st.session_state:
+            st.snow()
+            memory = ConversationBufferMemory(memory_key='history', return_messages=True)
+            model_name = "gpt-4"
+            llm = ChatOpenAI(model_name=model_name, openai_api_key=OPENAI_API_KEY, max_tokens=1000)
+            conversation_chain = ConversationChain(
+                llm=llm,
+                memory=memory
+            )
+            st.session_state.conversation = conversation_chain
+            st.session_state.history = memory
+            st.session_state.openai_cost = []
+             
+        
+        file_list = st.file_uploader(":orange[**Please upload your PDF or DOCX files here:**]", type=["pdf","docx"], accept_multiple_files=True) 
+        # Extract the text from each PDF
+        text=""
+        if file_list: 
+            for file in file_list:
+                text += file.name
+                if ".pdf" in file.name:
+                    pdf_reader = PdfReader(file)
+                    for page in pdf_reader.pages:
+                        text += page.extract_text()
+                elif ".docx" in file.name:
+                    text += docx2txt.process(file)
 
-      user_question = st.text_input(":orange[**How can I help you?**]", placeholder="Enter your question here")  
+        st.text_input(":orange[**How can I help you?**]", placeholder="Enter your question here", key='widget', on_change=submit)  
 
-      if user_question:
-          # [Rest of the code...]
+        user_question = st.session_state.get('my_text', '')
+        
+        
+        if user_question!="":
+            if text!="":
+                user_question+=text
+        
+            st.balloons()
+            # [Rest of the code...]
 
-          with st.spinner(text="**Operation in progress ⏳**"):
-              with get_openai_callback() as cost:
-                  response = st.session_state.conversation({'input': user_question})
-              st.session_state.openai_cost.append(cost.total_cost)
+            with st.spinner(text="**Operation in progress ⏳**"):
+                with get_openai_callback() as cost:
+                    response = st.session_state.conversation({'input': user_question})
+                st.session_state.openai_cost.append(cost.total_cost)
 
-          for index, message in enumerate(response['history']):
-            if index%2==0:
-              st.write("<h6 style='color:#d95a00;'>"+message.content+"</h6>", unsafe_allow_html = True)
-              st.write("**Cost of Operation: :green[$"+str('%.6f'%(st.session_state.openai_cost[int(index/2)]))+"]**")
-            else: 
-              st.write("<h6>"+message.content+"</h6>", unsafe_allow_html = True)
-      
+            for index, message in enumerate(response['history']):
+                if index%2==0:
+                    st.write("<h6 style='color:#d95a00;'>"+message.content+"</h6>", unsafe_allow_html = True)
+                    st.write("**Cost of Operation: :green[$"+str('%.6f'%(st.session_state.openai_cost[int(index/2)]))+"]**")
+                else: 
+                    st.write("<h6>"+message.content+"</h6>", unsafe_allow_html = True)
+            
 
 
 if __name__ == '__main__':
