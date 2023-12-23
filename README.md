@@ -33,8 +33,8 @@ It processes user queries related to test engineering using uploaded documents.
 Generates responses and code templates tailored for test cases.
 
 ## Customization
-You can modify the Streamlit UI elements and styles.
-Adjust GPT-4 model parameters for different response details or specificities.
+You can modify the Streamlit UI styles using the top bar in the application.
+Adjust GPT models within app.py for different response details or specificities.
 
 ## Support
 For any issues or queries, please refer to the documentation of the libraries used.
