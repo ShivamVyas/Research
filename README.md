@@ -54,7 +54,8 @@ furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> [!WARNING]
+> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -65,4 +66,5 @@ SOFTWARE.
 ### OpenAI API Terms
 Usage of the OpenAI API, as integrated into this project, is subject to [OpenAI's terms and conditions](https://openai.com/api/policies/terms/). By using this project, you agree to comply with all terms set forth by OpenAI for API usage. It is the responsibility of the individual or organization using this project to ensure compliance with these terms.
 
-**Note**: OpenAI's API terms include guidelines on data usage, privacy, and restrictions on certain types of content. Users of this project should review these terms in detail to understand their obligations and restrictions.
+> [!NOTE]
+> OpenAI's API terms include guidelines on data usage, privacy, and restrictions on certain types of content. Users of this project should review these terms in detail to understand their obligations and restrictions.
