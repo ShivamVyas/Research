@@ -19,7 +19,8 @@ This command installs all required libraries such as streamlit, urllib, Pillow, 
 3. Environment Variables: Set up an .env file with your OpenAI API key.
 
 ## Usage
-1. **Launch Streamlit UI:** Execute the script to initiate the Streamlit interface.
+1. **Launch Streamlit UI:** Execute the following script in terminal to initiate the Streamlit interface.
+   streamlit run app.py
 2. **API Key Configuration:** Input your OpenAI API key in the Streamlit sidebar.
 3. **Document Upload:** Upload PDF or DOCX files for analysis.
 4. **Querying:** Submit test engineering queries to obtain responses and code templates.
