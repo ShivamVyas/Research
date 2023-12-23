@@ -13,14 +13,11 @@ from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
 
 # Environment Variable 
-import os
 from dotenv import load_dotenv
 
 # Open AI And Facebook's Similarity Search Libraries
 from langchain.chat_models import ChatOpenAI
-from langchain.vectorstores import FAISS
 from langchain.callbacks import get_openai_callback
-from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.chains.question_answering import load_qa_chain 
 
 from langchain.memory import ConversationBufferMemory
