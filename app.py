@@ -17,7 +17,6 @@ import os
 from dotenv import load_dotenv
 
 # Open AI And Facebook's Similarity Search Libraries
-import tiktoken
 from langchain.chat_models import ChatOpenAI
 from langchain.vectorstores import FAISS
 from langchain.callbacks import get_openai_callback
@@ -122,7 +121,7 @@ def main():
     sidebar_img()
     
     # Title
-    st.markdown("<h2>&emsp;&nbsp;&emsp;👨🏽‍💻 Testing Engineering Model 👩🏽‍💻</h2>", unsafe_allow_html = True)
+    st.markdown("<h2>&emsp;&emsp;&emsp;👨🏽‍💻 Test Engineering Model 👩🏽‍💻</h2>", unsafe_allow_html = True)
     st.sidebar.markdown("## API Configuration 🔧")
     
     OPENAI_API_KEY = st.sidebar.text_input(":orange[**Add your OpenAI key and Press Enter**]", type="password")
@@ -141,7 +140,7 @@ def main():
         if "history" not in st.session_state:
             st.snow()
             memory = ConversationBufferMemory(memory_key='history', return_messages=True)
-            model_name = "gpt-3.5-turbo-16k-0613"
+            model_name = "gpt-3.5-turbo-1106"
             llm = ChatOpenAI(model_name=model_name, openai_api_key=OPENAI_API_KEY)
             conversation_chain = ConversationChain(
                 llm=llm,
@@ -167,25 +166,20 @@ def main():
                 st.balloons()
                 # if text!="":
                 #     user_question+=text
-            
-                
                 
                 with st.spinner(text="**Operation in progress ⏳**"):
                     with get_openai_callback() as cost:
                         response = st.session_state.conversation({'input': user_question})
                     st.session_state.openai_cost.append(cost.total_cost)
                 output = response['history'][-1].content
-                
-                st.write("<h6>Question: "+response['history'][-2].content+"</h6>", unsafe_allow_html = True)
-                
-                st.write("**Response: "+":orange["+output+"]**") 
-                st.write("**Cost of Operation: :green[$"+str('%.6f'%(0.0001*(len(output)/3)/1000))+"]**")
+                st.write("**Cost of Operation: :green[$"+str('%.6f'%(0.008*(len(output)/3)/1000))+"]**")
+                st.write("<h6 style='color:#d95a00;'>"+"Question: </h6>"+"<h6>"+response['history'][-2].content+"</h6>", unsafe_allow_html = True)
+                st.write("<h6 style='color:#d95a00;'>"+"Response: </h6>"+"<h6>"+output+"</h6>", unsafe_allow_html = True) 
                 
                 #Not working for gpt-3.5-turbo-1106 and gpt-4-1106-preview
                 #st.write("**Cost of Operation: :green[$"+str('%.6f'%(st.session_state.openai_cost[-1]))+"]**")
-                
                 user_question=""
-            
+                
             #debugging    
             #print(st.session_state.history.chat_memory.messages)    
 
