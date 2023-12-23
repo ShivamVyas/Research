@@ -19,11 +19,13 @@ This command installs all required libraries such as streamlit, urllib, Pillow, 
 3. Environment Variables: Set up an .env file with your OpenAI API key.
 
 ## Usage
-1. **Launch Streamlit UI:** Execute the following script in terminal to initiate the Streamlit interface.
+1. **Setup Terminal:** C:\...\Summer-Research-1.1>
+2. **Launch Streamlit UI:** Execute the following script in terminal to initiate the Streamlit interface.
+   ```bash
    streamlit run app.py
-2. **API Key Configuration:** Input your OpenAI API key in the Streamlit sidebar.
-3. **Document Upload:** Upload PDF or DOCX files for analysis.
-4. **Querying:** Submit test engineering queries to obtain responses and code templates.
+3. **API Key Configuration:** Input your OpenAI API key in the Streamlit sidebar.
+4. **Document Upload (Optional):** Upload PDF or DOCX files for analysis.
+5. **Querying:** Submit test engineering queries to obtain responses and code templates.
 
 ## How It Works
 The prototype integrates various Python libraries and OpenAI's GPT-4 model.
