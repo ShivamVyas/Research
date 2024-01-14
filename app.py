@@ -137,7 +137,7 @@ def main():
         if "history" not in st.session_state:
             st.snow()
             memory = ConversationBufferMemory(memory_key='history', return_messages=True)
-            model_name = "gpt-3.5-turbo-1106"
+            model_name = "gpt-4"
             llm = ChatOpenAI(model_name=model_name, openai_api_key=OPENAI_API_KEY)
             conversation_chain = ConversationChain(
                 llm=llm,
