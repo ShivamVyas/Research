@@ -4,7 +4,7 @@
 This prototype is designed for organizations to fine-tune their test engineering processes and needs. It integrates Python programming with OpenAI's GPT-4, enabling users to input test engineering queries and receive comprehensive responses, aiding in test case development and automation of repetitive testing tasks.
 
 ## Features
-- **Integration with OpenAI GPT-4**: Leverages GPT-4 for processing test engineering queries.
+- **Integration with OpenAI GPT-4**: Leverages OpenAI Model for processing test engineering queries.
 - **Automated Test Case Generation**: Provides code templates for efficient and accurate automated testing.
 - **Multi-format Document Parsing**: Supports PDF and DOCX files.
 - **Custom User Interface**: Interactive and user-friendly interface using Streamlit.
