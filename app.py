@@ -1,5 +1,5 @@
 import streamlit as st
-from llama_index.agent import OpenAIAssistantAgent
+from llama_index.agent.openai import OpenAIAssistantAgent
 import openai
 import os
 import asyncio
@@ -90,7 +90,7 @@ Remember, your role is to aid in the development and automation of test cases, a
         verbose=True,
         #openai_tools=[{"type": "code_interpreter"}], 
         #To use the retrieval feature you can use this code with this you can upload a PDF where the model will use it to answer the user questions it is basically a RAG implemented
-        openai_tools=[{"type": "retrieval"},{"type": "code_interpreter"}],
+        openai_tools=[{"type": "file_search"},{"type": "code_interpreter"}],
         files=files,
         instructions_prefix="Always be interactive with the user and keep asking him questions before answering. Each answer need to be in parts and then ask the user to proceed to the next part or not before proceeding. any code written needs to be in R markdown to be in a good result in streamlit"
     )
